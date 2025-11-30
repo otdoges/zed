@@ -1,7 +1,9 @@
 mod acp;
 mod agent_configuration;
+mod agent_context_menu;
 mod agent_diff;
 mod agent_model_selector;
+mod agent_modes;
 mod agent_panel;
 mod buffer_codegen;
 mod completion_provider;
@@ -12,12 +14,14 @@ mod inline_prompt_editor;
 mod language_model_selector;
 mod mention_set;
 mod profile_selector;
+mod quick_edit;
 mod slash_command;
 mod slash_command_picker;
 mod terminal_codegen;
 mod terminal_inline_assistant;
 mod text_thread_editor;
 mod ui;
+mod visual_indicators;
 
 use std::rc::Rc;
 use std::sync::Arc;
@@ -45,7 +49,10 @@ use std::any::TypeId;
 
 use crate::agent_configuration::{ConfigureContextServerModal, ManageProfilesModal};
 pub use crate::agent_panel::{AgentPanel, ConcreteAssistantPanelDelegate};
+pub use crate::agent_modes::AgentMode;
 pub use crate::inline_assistant::InlineAssistant;
+pub use crate::quick_edit::{QuickEdit, SendSelectionToAgent, OpenQuickEditForSelection};
+pub use crate::visual_indicators::{TokenInfo, SelectionInfo};
 pub use agent_diff::{AgentDiffPane, AgentDiffToolbar};
 pub use text_thread_editor::{AgentPanelDelegate, TextThreadEditor};
 use zed_actions;
@@ -121,6 +128,10 @@ actions!(
         ContinueWithBurnMode,
         /// Toggles burn mode for faster responses.
         ToggleBurnMode,
+        /// Send selected code to the agent panel in the main thread.
+        SendSelectionToAgent,
+        /// Open quick edit UI for current selection.
+        OpenQuickEditForSelection,
     ]
 );
 
@@ -233,6 +244,7 @@ pub fn init(
     }
     assistant_slash_command::init(cx);
     agent_panel::init(cx);
+    agent_context_menu::init(cx);
     context_server_configuration::init(language_registry.clone(), fs.clone(), cx);
     TextThreadEditor::init(cx);
 
@@ -249,6 +261,13 @@ pub fn init(
     })
     .detach();
     cx.observe_new(ManageProfilesModal::register).detach();
+
+    // Register quick edit handlers
+    cx.observe_new(|workspace: &mut Workspace, _window, cx| {
+        workspace.register_action(quick_edit::handle_quick_edit);
+        workspace.register_action(quick_edit::handle_send_selection_to_agent);
+    })
+    .detach();
 
     // Update command palette filter based on AI settings
     update_command_palette_filter(cx);

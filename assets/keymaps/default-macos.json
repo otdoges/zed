@@ -164,6 +164,8 @@
       "cmd-alt-l": ["buffer_search::Deploy", { "selection_search_enabled": true }],
       "cmd-e": ["buffer_search::Deploy", { "focus": false }],
       "cmd->": "agent::AddSelectionToThread",
+      "cmd-shift-k": "agent::SendSelectionToAgent",
+      "cmd-k": "agent::OpenQuickEditForSelection",
       "cmd-<": "assistant::InsertIntoEditor",
       "cmd-alt-e": "editor::SelectEnclosingSymbol",
       "alt-enter": "editor::OpenSelectionsInMultibuffer"
