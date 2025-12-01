@@ -6,7 +6,6 @@
 
 use gpui::{App, Context, Window};
 use workspace::Workspace;
-use editor::Editor;
 
 /// Context menu item for asking the agent about selected code
 pub struct AskAgentAboutThis;

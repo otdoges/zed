@@ -5,18 +5,11 @@
 /// quick edit functionality.
 
 use std::ops::Range;
-use std::rc::Rc;
-use std::sync::Arc;
 
-use anyhow::Result;
-use editor::{Editor, MultiBuffer};
-use gpui::{Action, App, Context, Entity, Subscription, WeakEntity, Window, actions};
-use language::{Point};
-use project::Project;
-use text::ToPoint;
+use editor::Editor;
+use gpui::{Action, App, Context, Entity, Subscription, WeakEntity, Window};
+use multi_buffer::MultiBufferOffset;
 use workspace::Workspace;
-
-use crate::inline_assistant::InlineAssistant;
 
 /// Quick edit action triggered from editor with selected code
 #[derive(Clone, PartialEq, Action)]
@@ -63,13 +56,13 @@ impl QuickEditState {
     }
 
     /// Get the selected text from the editor
-    pub fn selected_text(&self, cx: &App) -> Option<String> {
+    pub fn selected_text(&self, window: &Window, cx: &App) -> Option<String> {
         let editor = self.editor.upgrade()?;
-        let snapshot = editor.read(cx).snapshot(cx);
+        let snapshot = editor.read(cx).snapshot(window, cx);
         let buffer = snapshot.buffer_snapshot();
 
-        let start_offset = self.selection_range.start;
-        let end_offset = self.selection_range.end;
+        let start_offset = MultiBufferOffset(self.selection_range.start);
+        let end_offset = MultiBufferOffset(self.selection_range.end);
 
         if start_offset >= buffer.len() || end_offset > buffer.len() || start_offset > end_offset
         {
@@ -80,21 +73,21 @@ impl QuickEditState {
     }
 
     /// Get file context information for the selection
-    pub fn get_context_info(&self, cx: &App) -> Option<ContextInfo> {
+    pub fn get_context_info(&self, window: &Window, cx: &App) -> Option<ContextInfo> {
         let editor = self.editor.upgrade()?;
-        let snapshot = editor.read(cx).snapshot(cx);
+        let snapshot = editor.read(cx).snapshot(window, cx);
         let buffer = snapshot.buffer_snapshot();
 
         // Get file path
-        let file_path = buffer.file().and_then(|file| {
+        let file_path = buffer.file_at(MultiBufferOffset(self.selection_range.start)).and_then(|file| {
             file.full_path(cx)
                 .ok()
                 .map(|p| p.to_string_lossy().to_string())
         });
 
         // Get line range for the selection
-        let start_offset = self.selection_range.start;
-        let end_offset = self.selection_range.end;
+        let start_offset = MultiBufferOffset(self.selection_range.start);
+        let end_offset = MultiBufferOffset(self.selection_range.end);
 
         let start_point = buffer.offset_to_point(start_offset);
         let end_point = buffer.offset_to_point(end_offset);

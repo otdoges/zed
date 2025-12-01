@@ -6,13 +6,12 @@
 /// - Agent's proposed changes
 /// - Token count and context information
 
-use std::ops::Range;
-use gpui::{HighlightStyle, Color, Hsla};
+use gpui::{HighlightStyle, Hsla};
 
 /// Style for code selected for agent
 pub fn selected_for_agent_style() -> HighlightStyle {
     HighlightStyle {
-        color: Some(Color::Named("editor.line_selection")),
+        color: None,
         background_color: Some(Hsla {
             h: 60.0,
             s: 0.5,
@@ -23,6 +22,7 @@ pub fn selected_for_agent_style() -> HighlightStyle {
         font_style: None,
         underline: None,
         strikethrough: None,
+        fade_out: None,
     }
 }
 
@@ -40,6 +40,7 @@ pub fn agent_editing_style() -> HighlightStyle {
         font_style: None,
         underline: None,
         strikethrough: None,
+        fade_out: None,
     }
 }
 
@@ -57,6 +58,7 @@ pub fn proposed_changes_style() -> HighlightStyle {
         font_style: None,
         underline: None,
         strikethrough: None,
+        fade_out: None,
     }
 }
 

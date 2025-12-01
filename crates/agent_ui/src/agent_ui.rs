@@ -33,6 +33,7 @@ use command_palette_hooks::CommandPaletteFilter;
 use feature_flags::FeatureFlagAppExt as _;
 use fs::Fs;
 use gpui::{Action, App, Entity, SharedString, actions};
+use workspace::Workspace;
 use language::{
     LanguageRegistry,
     language_settings::{AllLanguageSettings, EditPredictionProvider},
@@ -51,7 +52,7 @@ use crate::agent_configuration::{ConfigureContextServerModal, ManageProfilesModa
 pub use crate::agent_panel::{AgentPanel, ConcreteAssistantPanelDelegate};
 pub use crate::agent_modes::AgentMode;
 pub use crate::inline_assistant::InlineAssistant;
-pub use crate::quick_edit::{QuickEdit, SendSelectionToAgent, OpenQuickEditForSelection};
+pub use crate::quick_edit::QuickEdit;
 pub use crate::visual_indicators::{TokenInfo, SelectionInfo};
 pub use agent_diff::{AgentDiffPane, AgentDiffToolbar};
 pub use text_thread_editor::{AgentPanelDelegate, TextThreadEditor};
